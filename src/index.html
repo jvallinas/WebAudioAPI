@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<title>WebAudio API sandbox</title>
+</head>
+
+<style>
+	body {
+		font-family: sans-serif;
+	}
+
+	h1.title {
+		color: darkslateblue;
+	}
+
+	audio-web-component {
+		margin: 24px 0;
+	}
+
+	#drop-area {
+		margin-top: 50px;
+		border: 2px dashed #ccc;
+		border-radius: 20px;
+		width: 480px;
+		font-family: sans-serif;
+		padding: 20px;
+	}
+
+	#drop-area.highlight {
+		border-color: darkslateblue;
+	}
+
+	p {
+		margin-top: 0;
+	}
+
+	form {
+		margin-bottom: 10px;
+	}
+
+
+	#gallery, #tracks {
+		margin-top: 10px;
+	}
+
+	#gallery img {
+		width: 150px;
+		margin-bottom: 10px;
+		margin-right: 10px;
+		vertical-align: middle;
+	}
+
+	.button {
+		display: inline-block;
+		padding: 10px;
+		background: #ccc;
+		cursor: pointer;
+		border-radius: 5px;
+		border: 1px solid #ccc;
+	}
+
+	.button:hover {
+		background: #ddd;
+	}
+
+	#fileElem {
+		display: none;
+	}
+</style>
+
+<body>
+	<h1 class="title">WebAudio API sandbox</h1>
+	<span class="info">Just a sandbox to experiment with WebAudio API and other stuff.</span>
+	<div id="drop-area">
+		<form>
+			<p>Upload multiple sound files (or images) with the file dialog by dragging and dropping</p>
+			<input type="file" id="fileElem" multiple accept="image/*, audio/*" onchange="handleFiles(this.files)">
+			<label class="button" for="fileElem">Select some files</label>
+		</form>
+	</div>
+
+	<!-- TODO use slots for below? -->
+
+	<!-- Uploaded sound files will be inserted here -->
+	<section id="tracks"></section>
+	<!-- Uploaded images will be inserted here -->
+	<section id="gallery"></section>
+</body>
+
+<script>
+
+	const handleFiles = (files) => {
+		([...files]).forEach(processFile);
+
+	};
+	function processFile(file) {
+		let reader = new FileReader();
+		reader.readAsDataURL(file);
+		reader.onloadend = function processFileBasedOnType() {
+
+			// Process image files
+			if (file.type.match(new RegExp(/image*/))) {
+				console.log('Importing image');
+				let img = document.createElement('img');
+				img.src = reader.result;
+				document.getElementById('gallery').appendChild(img);
+				return;
+			}
+
+			// Process audio files
+			if (file.type.match(new RegExp(/audio*/))) {
+				console.log('Importing music');
+
+				// Initializes custom element audio-web-component with track data
+				let audioWebComponent = document.createElement('audio-web-component');
+				audioWebComponent.setAttribute('track', reader.result);
+				document.getElementById('tracks').appendChild(audioWebComponent);
+				return;
+			}
+		}
+	}
+
+	let dropArea = document.getElementById('drop-area');
+
+	['dragenter', 'dragover'].forEach(eventName => {
+		dropArea.addEventListener(eventName, highlight, false);
+	});
+
+	['dragleave', 'drop'].forEach(eventName => {
+		dropArea.addEventListener(eventName, unhighlight, false);
+	});
+
+	function highlight(e) {
+		dropArea.classList.add('highlight');
+	}
+
+	function unhighlight(e) {
+		dropArea.classList.remove('highlight');
+	}
+
+	function handleDropEvent(e) {
+		let dt = e.dataTransfer;
+		let files = dt.files;
+		console.log('Files dropped: ', files);
+		handleFiles(files);
+	}
+
+	// Generic handling of drag and drop events
+	const handleDragAndDropEvent = (e) => {
+		e.preventDefault();
+		console.log('Handling drag and drop event: ', e.type);
+	};
+
+	['dragenter', 'dragleave', 'dragover', 'drop'].forEach(eventType => {
+		dropArea.addEventListener(eventType, handleDragAndDropEvent, false);
+	});
+
+	dropArea.addEventListener('drop', handleDropEvent, false);
+
+</script>
+
+</html>
