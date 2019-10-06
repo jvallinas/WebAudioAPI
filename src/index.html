@@ -44,13 +44,6 @@
 		margin-top: 10px;
 	}
 
-	#gallery img {
-		width: 150px;
-		margin-bottom: 10px;
-		margin-right: 10px;
-		vertical-align: middle;
-	}
-
 	.button {
 		display: inline-block;
 		padding: 10px;
@@ -71,10 +64,14 @@
 
 <body>
 	<h1 class="title">WebAudio API sandbox</h1>
-	<span class="info">Just a sandbox to experiment with WebAudio API and other stuff.</span>
+	<span class="info">An ongoing sandbox to experiment with native APIs and other stuff.</span>
+	<ul>
+		<li>WebAudio API (audio filtering, etc)</li>
+		<li>CSS Grid layout system for images</li>
+	</ul>
 	<div id="drop-area">
 		<form>
-			<p>Upload multiple sound files (or images) with the file dialog by dragging and dropping</p>
+			<p>Upload sound files (or images) with the file dialog by dragging and dropping</p>
 			<input type="file" id="fileElem" multiple accept="image/*, audio/*" onchange="handleFiles(this.files)">
 			<label class="button" for="fileElem">Select some files</label>
 		</form>
@@ -85,7 +82,7 @@
 	<!-- Uploaded sound files will be inserted here -->
 	<section id="tracks"></section>
 	<!-- Uploaded images will be inserted here -->
-	<section id="gallery"></section>
+	<custom-image-gallery id="gallery"></custom-image-gallery>
 </body>
 
 <script>
@@ -104,7 +101,7 @@
 				console.log('Importing image');
 				let img = document.createElement('img');
 				img.src = reader.result;
-				document.getElementById('gallery').appendChild(img);
+				document.getElementById('gallery').addImage(img);
 				return;
 			}
 
